@@ -9,22 +9,12 @@ using System.Resources;
 
 namespace Scheduler.Repository
 {
-    public class LoginRepository
+    public class LoginRepository : MySqlRepository
     {
-        public readonly string Server = "52.206.157.109";
-        public readonly string Database = "U04bgv";
-        public readonly string Uid = "U04bgv";
-        public readonly string Password = "53688194549";
         public User LoggedInUser;
-
-        public string ConnectionString
-        {
-            get { return $"SERVER={Server}; DATABASE={Database}; Uid={Uid}; Pwd={Password};" + "SslMode=None; Convert Zero Datetime = True;"; }
-        }
 
         public LoginRepository()
         {
-            AddAutoIncrement();
             PopulateData();
         }
 
@@ -36,7 +26,6 @@ namespace Scheduler.Repository
             var result = new LoginResult();
             result.Successful = false;
 
-            MySqlConnection connection = new MySqlConnection(ConnectionString);
             connection.Open();
 
             var sql = $"SELECT * FROM user WHERE userName = @UserName AND password = @Password";
@@ -83,7 +72,6 @@ namespace Scheduler.Repository
         public User GetUser(string username)
         {
             var user = new User();
-            MySqlConnection connection = new MySqlConnection(ConnectionString);
             connection.Open();
 
             var sql = $"SELECT * FROM user WHERE userName = @UserName";
@@ -115,7 +103,6 @@ namespace Scheduler.Repository
 
         public void SaveNewUser(User user)
         {
-            MySqlConnection connection = new MySqlConnection(ConnectionString);
             connection.Open();
             var sql = $"INSERT INTO user (userName, password, active, createDate, createdBy, lastUpdate, lastUpdateBy) " +
                       $"VALUES (@UserName, @Password, @Active, @CreateDate, @CreatedBy, @LastUpdate, @LastUpdateBy)";
@@ -132,8 +119,8 @@ namespace Scheduler.Repository
 
                 cmd.Parameters["@UserName"].Value = user.UserName;
                 cmd.Parameters["@Password"].Value = user.Password;
-                cmd.Parameters["@Active"].Value = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss");
-                cmd.Parameters["@CreateDate"].Value = user.Password;
+                cmd.Parameters["@Active"].Value = user.Active ? 1 : 0;
+                cmd.Parameters["@CreateDate"].Value = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss");
                 cmd.Parameters["@CreatedBy"].Value = LoggedInUser.UserName;
                 cmd.Parameters["@LastUpdate"].Value = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss");
                 cmd.Parameters["@LastUpdateBy"].Value = LoggedInUser.UserName;
@@ -171,8 +158,10 @@ namespace Scheduler.Repository
             return null;
         }
 
-        public void PopulateData()
+        public override void PopulateData()
         {
+            TruncateTables();
+
             var user1 = new User
             {
                 UserName = "mom",
@@ -199,29 +188,6 @@ namespace Scheduler.Repository
             SaveNewUser(user1);
             SaveNewUser(user2);
             SaveNewUser(user3);
-        }
-
-        public void AddAutoIncrement()
-        {
-            MySqlConnection connection = new MySqlConnection(ConnectionString);
-            connection.Open();
-            var sql = $"ALTER TABLE user MODIFY userId MEDIUMINT NOT NULL AUTO_INCREMENT;";
-            try
-            {
-                MySqlCommand cmd = new MySqlCommand(sql, connection);
-                cmd.ExecuteNonQuery();
-            }
-            catch (Exception e)
-            {
-                throw e;
-            }
-            finally
-            {
-                if (connection.State == ConnectionState.Open)
-                {
-                    connection.Close();
-                }
-            }
         }
 
         private void LogActivity(User user)

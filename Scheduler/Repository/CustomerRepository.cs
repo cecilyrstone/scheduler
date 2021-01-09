@@ -14,8 +14,6 @@ namespace Scheduler.Repository
         public CustomerRepository(User user, AddressRepository addressRepo)
         {
             LoggedInUser = user;
-            // Leaving the method here because the database schema seems volatile, for something that cannot be changed.
-            // AddAutoIncrement();
             PopulateData();
             AddressRepo = addressRepo;
         }
@@ -23,7 +21,6 @@ namespace Scheduler.Repository
         public Customer GetCustomer(int id)
         {
             var customer = new Customer();
-            MySqlConnection connection = new MySqlConnection(ConnectionString);
             connection.Open();
 
             var sql = $"SELECT * FROM customer WHERE customerId = @Id;";
@@ -55,7 +52,6 @@ namespace Scheduler.Repository
 
         public void SaveCustomer(Customer customer)
         {
-            MySqlConnection connection = new MySqlConnection(ConnectionString);
             connection.Open();
             var sql = $"INSERT INTO customer (customerName, addressId, active, createDate, createdBy, lastUpdate, lastUpdateBy) " +
                       $"VALUES (@CustomerName, @AddressId, @Active, " +
@@ -96,7 +92,6 @@ namespace Scheduler.Repository
 
         public void UpdateCustomer(Customer customer)
         {
-            MySqlConnection connection = new MySqlConnection(ConnectionString);
             connection.Open();
             var sql = $"UPDATE customer " +
                       $"SET customerName = @CustomerName, " +
@@ -137,7 +132,6 @@ namespace Scheduler.Repository
 
         public void DeleteCustomer(int id)
         {
-            MySqlConnection connection = new MySqlConnection(ConnectionString);
             connection.Open();
 
             try
@@ -164,7 +158,6 @@ namespace Scheduler.Repository
         public List<Customer> GetAllCustomers()
         {
             var customers = new List<Customer>();
-            MySqlConnection connection = new MySqlConnection(ConnectionString);
             connection.Open();
 
             var sql = $"SELECT * FROM customer;";
@@ -272,29 +265,6 @@ namespace Scheduler.Repository
             SaveCustomer(customer1);
             SaveCustomer(customer2);
             SaveCustomer(customer3);
-        }
-
-        public void AddAutoIncrement()
-        {
-            MySqlConnection connection = new MySqlConnection(ConnectionString);
-            connection.Open();
-            var sql = $"ALTER TABLE customer MODIFY customerId MEDIUMINT NOT NULL AUTO_INCREMENT;";
-            try
-            {
-                MySqlCommand cmd = new MySqlCommand(sql, connection);
-                cmd.ExecuteNonQuery();
-            }
-            catch (Exception e)
-            {
-                throw e;
-            }
-            finally
-            {
-                if (connection.State == ConnectionState.Open)
-                {
-                    connection.Close();
-                }
-            }
         }
     }
 }

@@ -9,9 +9,9 @@ namespace Scheduler.Repository
     public class AddressRepository : MySqlRepository
     {
         public User LoggedInUser { get; set; }
+
         public AddressRepository(User user)
         {
-            AddAutoIncrement();
             LoggedInUser = user;
             InitializeCitiesAndCountries();
             PopulateData();
@@ -20,7 +20,6 @@ namespace Scheduler.Repository
         public Address GetAddress(int id)
         {
             var address = new Address();
-            MySqlConnection connection = new MySqlConnection(ConnectionString);
             connection.Open();
 
             var sql = $"SELECT * FROM address WHERE addressid = @id";
@@ -51,7 +50,6 @@ namespace Scheduler.Repository
 
         public int SaveAddress(Address address)
         {
-            MySqlConnection connection = new MySqlConnection(ConnectionString);
             connection.Open();
             var sql = $"INSERT INTO address (address, address2, cityId, postalCode, phone, createDate, createdBy, lastUpdate, lastUpdateBy) " +
                       $"VALUES (@Address1, @Address2, @CityId, @PostalCode, @Phone, " +
@@ -97,7 +95,6 @@ namespace Scheduler.Repository
 
         public void UpdateAddress(Address address)
         {
-            MySqlConnection connection = new MySqlConnection(ConnectionString);
             connection.Open();
             var sql = $"UPDATE address " +
                       $"SET address = @Address1, " +
@@ -144,7 +141,6 @@ namespace Scheduler.Repository
 
         public void DeleteAddress(int id)
         {
-            MySqlConnection connection = new MySqlConnection(ConnectionString);
             connection.Open();
 
             try
@@ -171,7 +167,6 @@ namespace Scheduler.Repository
         public List<City> GetAllCities()
         {
             var cities = new List<City>();
-            MySqlConnection connection = new MySqlConnection(ConnectionString);
             connection.Open();
 
             var sql = $"SELECT * FROM city;";
@@ -201,7 +196,6 @@ namespace Scheduler.Repository
         public List<Country> GetAllCountries()
         {
             var countries = new List<Country>();
-            MySqlConnection connection = new MySqlConnection(ConnectionString);
             connection.Open();
 
             var sql = $"SELECT * FROM country;";
@@ -250,7 +244,6 @@ namespace Scheduler.Repository
 
         public void SaveCitiesAndCountries(List<City> cities, List<Country> countries)
         {
-            MySqlConnection connection = new MySqlConnection(ConnectionString);
             connection.Open();
 
             try
@@ -396,29 +389,6 @@ namespace Scheduler.Repository
 
             SaveAddress(address1);
             SaveAddress(address2);
-        }
-
-        public void AddAutoIncrement()
-        {
-            MySqlConnection connection = new MySqlConnection(ConnectionString);
-            connection.Open();
-            var sql = $"ALTER TABLE address MODIFY addressId MEDIUMINT NOT NULL AUTO_INCREMENT; ALTER TABLE city MODIFY cityId MEDIUMINT NOT NULL AUTO_INCREMENT; ALTER TABLE country MODIFY countryId MEDIUMINT NOT NULL AUTO_INCREMENT;";
-            try
-            {
-                MySqlCommand cmd = new MySqlCommand(sql, connection);
-                cmd.ExecuteNonQuery();
-            }
-            catch (Exception e)
-            {
-                throw e;
-            }
-            finally
-            {
-                if (connection.State == ConnectionState.Open)
-                {
-                    connection.Close();
-                }
-            }
         }
     }
 }
