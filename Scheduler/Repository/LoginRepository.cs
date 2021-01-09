@@ -2,6 +2,7 @@
 using Scheduler.Models;
 using Scheduler.Services;
 using System;
+using System.Collections.Generic;
 using System.Data;
 using System.IO;
 using System.Reflection;
@@ -13,9 +14,10 @@ namespace Scheduler.Repository
     {
         public User LoggedInUser;
 
-        public LoginRepository()
+        public LoginRepository(bool firstInstance = true)
         {
-            PopulateData();
+            if (firstInstance)
+                PopulateData();
         }
 
         public LoginResult TryLogin(string username, string password)
@@ -101,6 +103,35 @@ namespace Scheduler.Repository
             return user;
         }
 
+        public List<User> GetAllUsers()
+        {
+            var users = new List<User>();
+            connection.Open();
+
+            var sql = $"SELECT * FROM user";
+
+            try
+            {
+                MySqlCommand cmd = new MySqlCommand(sql, connection);
+                var reader = cmd.ExecuteReader();
+                users = ConstructUsers(reader);
+                reader.Close();
+            }
+            catch (Exception e)
+            {
+                throw e;
+            }
+            finally
+            {
+                if (connection.State == ConnectionState.Open)
+                {
+                    connection.Close();
+                }
+            }
+
+            return users;
+        }
+
         public void SaveNewUser(User user)
         {
             connection.Open();
@@ -153,6 +184,31 @@ namespace Scheduler.Repository
                         Active = reader.GetBoolean("active")
                     };
                 }
+            }
+
+            return null;
+        }
+
+        private List<User> ConstructUsers(MySqlDataReader reader)
+        {
+            if (reader.HasRows)
+            {
+                var users = new List<User>();
+
+                while (reader.Read())
+                {
+                    var user = new User
+                    {
+                        Id = reader.GetInt32("userId"),
+                        UserName = reader.GetString("userName"),
+                        Password = reader.GetString("password"),
+                        Active = reader.GetBoolean("active")
+                    };
+
+                    users.Add(user);
+                }
+
+                return users;
             }
 
             return null;

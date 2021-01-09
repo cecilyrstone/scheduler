@@ -3,6 +3,7 @@ using Scheduler.Models;
 using Scheduler.Repository;
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Windows.Forms;
 
@@ -13,6 +14,7 @@ namespace Scheduler
         public CustomerRepository CustomerRepo { get; set; }
         public AppointmentRepository AppointmentRepo { get; set; }
         public AddressRepository AddressRepo { get; set; }
+        public LoginRepository UserRepo { get; set; }
         public User LoggedInUser { get; set; }
         public List<Appointment> Appointments { get; set; }
         public List<Customer> Customers { get; set; }
@@ -22,7 +24,8 @@ namespace Scheduler
             AddressRepo = new AddressRepository(user);
             CustomerRepo = new CustomerRepository(user, AddressRepo);
             AppointmentRepo = new AppointmentRepository(user);
-            
+            UserRepo = new LoginRepository(false);
+
             InitializeComponent();
             BindGrids();
         }
@@ -31,7 +34,6 @@ namespace Scheduler
         {
             Customers = CustomerRepo.GetAllCustomers();
             dgCustomers.DataSource = Customers;
-            // It is not a listed requirement to display address in data grid. Hiding address id column.
             dgCustomers.Columns["Address"].Visible = false;
             dgCustomers.Columns["AddressId"].Visible = false;
             Appointments = AppointmentRepo.GetAppointmentsForUser();
@@ -79,11 +81,6 @@ namespace Scheduler
             BindGrids();
         }
 
-        private void Dashboard_Click(Object sender, EventArgs e)
-        {
-            MessageBox.Show("You are in the Control.GotFocus event.");
-        }
-
         private void reminder_Tick(object sender, EventArgs e)
         {
             var upcomingAppointment = CheckForUpcomingAppointment();
@@ -105,11 +102,27 @@ namespace Scheduler
             return false;
         }
 
-        
-
         private void btnMasterSchedule_Click(object sender, EventArgs e)
         {
-            MessageBox.Show("Appointments are not currently tied to users in unalterable database schema.  Master Schedule available in next update.");
+            var report = "";
+
+            var users = UserRepo.GetAllUsers();
+            var appointments = AppointmentRepo.GetAllAppointments();
+
+            foreach (var user in users)
+            {
+                report += $"\n {user.UserName} \n-------------\n";
+                var appointmentsForUser = appointments.Where(a => a.UserId == user.Id).ToList();
+                foreach (var appt in appointmentsForUser)
+                {
+                    report += $"\n {appt.Title} \n";
+                    report += $"Start: {appt.Start.ToString("f", DateTimeFormatInfo.InvariantInfo)} -\n";
+                    report += $"End: {appt.End.ToString("f", DateTimeFormatInfo.InvariantInfo)} -\n";
+                    report += $"Location: {appt.Location} \n";
+                }
+            }
+
+            MessageBox.Show(report);
         }
 
         private void btnCustomersByCity_Click(object sender, EventArgs e)
