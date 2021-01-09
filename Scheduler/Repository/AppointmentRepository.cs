@@ -223,6 +223,38 @@ namespace Scheduler.Repository
             return appointments;
         }
 
+        public List<Appointment> GetAppointmentsForUser()
+        {
+            var appointments = new List<Appointment>();
+
+            connection.Open();
+
+            var sql = $"SELECT * FROM appointment where userId = @userId;";
+
+            try
+            {
+                MySqlCommand cmd = new MySqlCommand(sql, connection);
+                cmd.Parameters.Add("@userId", MySqlDbType.Int32);
+                cmd.Parameters["@userId"].Value = LoggedInUser.Id;
+                var reader = cmd.ExecuteReader();
+                appointments = ConstructAppointments(reader);
+                reader.Close();
+            }
+            catch (Exception e)
+            {
+                throw e;
+            }
+            finally
+            {
+                if (connection.State == ConnectionState.Open)
+                {
+                    connection.Close();
+                }
+            }
+
+            return appointments;
+        }
+
         private Appointment ConstructAppointment(MySqlDataReader reader)
         {
             if (reader.HasRows)

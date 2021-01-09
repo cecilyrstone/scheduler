@@ -34,7 +34,7 @@ namespace Scheduler
             // It is not a listed requirement to display address in data grid. Hiding address id column.
             dgCustomers.Columns["Address"].Visible = false;
             dgCustomers.Columns["AddressId"].Visible = false;
-            Appointments = AppointmentRepo.GetAllAppointments();
+            Appointments = AppointmentRepo.GetAppointmentsForUser();
             dgAppointments.DataSource = Appointments;
         }
 
@@ -90,8 +90,6 @@ namespace Scheduler
             MessageBox.Show("Alert! Upcoming Appointment");
         }
 
-        // In the database that the assignment says we cannot alter, appointments are not tied to users. There is no persisted user id.
-        // I cannot base this off of the login in absence of an fk relationship - checking all appointments instead.
         private bool CheckForUpcomingAppointment()
         {
             var beginReminderInterval = DateTime.Now;
@@ -107,10 +105,7 @@ namespace Scheduler
             return false;
         }
 
-        private void btnTypesReport_Click(object sender, EventArgs e)
-        {
-            MessageBox.Show("Types are not currently persisted in unalterable database schema.  Appointment Types by Month available in next update.");
-        }
+        
 
         private void btnMasterSchedule_Click(object sender, EventArgs e)
         {
@@ -135,6 +130,92 @@ namespace Scheduler
         {
             var weekly = new Weekly();
             weekly.Show();
+        }
+
+        private void btnTypesReport_Click(object sender, EventArgs e)
+        {
+            var appointments = AppointmentRepo.GetAllAppointments();
+
+            var report = GenerateMonthlyTypesReport(appointments);
+            MessageBox.Show(report);
+        }
+
+        private string GenerateMonthlyTypesReport(IList<Appointment> appointments)
+        {
+            var report = "";
+            var januaryTypes = GetTypesOfAppointmentsForMonth(1, appointments);
+            var februaryTypes = GetTypesOfAppointmentsForMonth(2, appointments);
+            var marchTypes = GetTypesOfAppointmentsForMonth(3, appointments);
+            var aprilTypes = GetTypesOfAppointmentsForMonth(4, appointments);
+            var mayTypes = GetTypesOfAppointmentsForMonth(5, appointments);
+            var juneTypes = GetTypesOfAppointmentsForMonth(6, appointments);
+            var julyTypes = GetTypesOfAppointmentsForMonth(7, appointments);
+            var augustTypes = GetTypesOfAppointmentsForMonth(8, appointments);
+            var septemberTypes = GetTypesOfAppointmentsForMonth(9, appointments);
+            var octoberTypes = GetTypesOfAppointmentsForMonth(10, appointments);
+            var novemberTypes = GetTypesOfAppointmentsForMonth(11, appointments);
+            var decemberTypes = GetTypesOfAppointmentsForMonth(12, appointments);
+
+            report += ConstructReportForMonth("January", januaryTypes);
+            report += ConstructReportForMonth("February", februaryTypes);
+            report += ConstructReportForMonth("March", marchTypes);
+            report += ConstructReportForMonth("April", aprilTypes);
+            report += ConstructReportForMonth("May", mayTypes);
+            report += ConstructReportForMonth("June", juneTypes);
+            report += ConstructReportForMonth("July", julyTypes);
+            report += ConstructReportForMonth("August", augustTypes);
+            report += ConstructReportForMonth("September", septemberTypes);
+            report += ConstructReportForMonth("October", octoberTypes);
+            report += ConstructReportForMonth("November", novemberTypes);
+            report += ConstructReportForMonth("December", decemberTypes);
+
+            return report;
+        }
+
+        private string ConstructReportForMonth(string monthName, IList<string> types)
+        {
+            var results = "\n";
+
+            if (types.Any())
+            {
+                results += $"{monthName} \n-------------";
+                results += GetAggregatesForMonth(types);
+            }
+            else
+            {
+                results += $"No appointments for {monthName} \n";
+            }
+
+            return results;
+        }
+
+        private List<string> GetTypesOfAppointmentsForMonth(int monthValue, IList<Appointment> appointments)
+        {
+            var monthTypes = new List<string>();
+
+            foreach (var appointment in appointments)
+            {
+                if (appointment.Start.Month == monthValue)
+                    monthTypes.Add(appointment.Type);
+            }
+
+            return monthTypes;
+        }
+
+        private string GetAggregatesForMonth(IList<string> typesInAMonth)
+        {
+            var result = "\n";
+            var q = from x in typesInAMonth
+                    group x by x into g
+                    let count = g.Count()
+                    orderby count descending
+                    select new { Type = g.Key, Count = count };
+            foreach (var x in q)
+            {
+                result += $"Type: {x.Type} \n Count: {x.Count}  \n";
+            }
+
+            return result;
         }
     }
 }
