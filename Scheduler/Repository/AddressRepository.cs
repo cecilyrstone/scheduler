@@ -145,7 +145,7 @@ namespace Scheduler.Repository
 
             try
             {
-                var sql = $"DELETE FROM address WHERE addressId = @Id;";
+                var sql = $"SET FOREIGN_KEY_CHECKS=0; DELETE FROM address WHERE addressId = @Id;";
                 MySqlCommand cmd = new MySqlCommand(sql, connection);
                 cmd.Parameters.Add("@Id", MySqlDbType.Int32);
                 cmd.Parameters["@Id"].Value = id;

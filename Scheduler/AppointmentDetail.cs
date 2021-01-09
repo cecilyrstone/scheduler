@@ -3,8 +3,6 @@ using Scheduler.Models;
 using Scheduler.Repository;
 using System;
 using System.Collections.Generic;
-using System.Data;
-using System.Linq;
 using System.Windows.Forms;
 
 namespace Scheduler
@@ -18,14 +16,17 @@ namespace Scheduler
         public AppointmentRepository AppointmentRepo { get; set; }
         public CustomerRepository CustomerRepo { get; set; }
         public AddressRepository AddressRepo { get; set; }
+        public User LoggedInUser { get; set; }
 
         public AppointmentDetail(DetailMode mode, 
                                  Dashboard parent, 
                                  AppointmentRepository aptRepo,
                                  CustomerRepository custRepo,
                                  AddressRepository addressRepo,
+                                 User loggedInUser,
                                  Appointment appointmentToModify = null)
         {
+            LoggedInUser = loggedInUser;
             AppointmentRepo = aptRepo;
             CustomerRepo = custRepo;
             AddressRepo = addressRepo;
@@ -73,8 +74,6 @@ namespace Scheduler
 
         private void LoadData()
         {
-            // lambda expression for simple retrieval of customer
-            cmbCustomer.SelectedIndex = Customers.Where(c => c.Id == AppointmentToModify.CustomerId).FirstOrDefault().Id;
             lblIdValue.Text = AppointmentToModify.Id.ToString();
             txtTitle.Text = AppointmentToModify.Title;
             txtDescription.Text = AppointmentToModify.Description;
@@ -126,14 +125,17 @@ namespace Scheduler
 
             return new Appointment()
             {
-                CustomerId = customer.Id,
+                Id = (Mode == DetailMode.Modify) ? AppointmentToModify.Id : 0,
+                CustomerId = (Mode == DetailMode.Modify) ? AppointmentToModify.CustomerId : customer.Id,
+                UserId = LoggedInUser.Id,
                 Title = txtTitle.Text,
                 Description = txtDescription.Text,
                 Location = txtLocation.Text,
                 Contact = txtContact.Text,
                 Url = txtUrl.Text,
                 Start = dtpBegin.Value,
-                End = dtpEnd.Value
+                End = dtpEnd.Value,
+                Type = txtType.Text
             };
         }
 

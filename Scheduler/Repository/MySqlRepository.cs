@@ -35,7 +35,7 @@ namespace Scheduler.Repository
                 var truncateCustomer = new MySqlCommand("SET FOREIGN_KEY_CHECKS=0; TRUNCATE TABLE customer;", connection);
                 var truncateAddress = new MySqlCommand("SET FOREIGN_KEY_CHECKS=0; TRUNCATE TABLE address;", connection);
                 var truncateCity = new MySqlCommand("SET FOREIGN_KEY_CHECKS=0; TRUNCATE TABLE city;", connection);
-                var truncateCountry = new MySqlCommand("SET FOREIGN_KEY_CHECKS=0; TRUNCATE TABLE country; SET FOREIGN_KEY_CHECKS=1;", connection);
+                var truncateCountry = new MySqlCommand("SET FOREIGN_KEY_CHECKS=0; TRUNCATE TABLE country;", connection);
 
                 truncateAppointment.ExecuteNonQuery();
                 truncateUser.ExecuteNonQuery();

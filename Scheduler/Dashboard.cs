@@ -21,6 +21,7 @@ namespace Scheduler
 
         public Dashboard(User user)
         {
+            LoggedInUser = user;
             AddressRepo = new AddressRepository(user);
             CustomerRepo = new CustomerRepository(user, AddressRepo);
             AppointmentRepo = new AppointmentRepository(user);
@@ -56,21 +57,22 @@ namespace Scheduler
         private void btnDeleteCustomer_Click(object sender, EventArgs e)
         {
             var selectedCustomer = (Customer)dgCustomers.SelectedRows[0].DataBoundItem;
-            AddressRepo.DeleteAddress(selectedCustomer.AddressId);
+            AppointmentRepo.DeleteAppointmentsForCustomer(selectedCustomer.Id);
             CustomerRepo.DeleteCustomer(selectedCustomer.Id);
+            AddressRepo.DeleteAddress(selectedCustomer.AddressId);
             BindGrids();
         }
 
         private void btnAddAppointment_Click(object sender, EventArgs e)
         {
-            var addAppointmentForm = new AppointmentDetail(DetailMode.Add, this, AppointmentRepo, CustomerRepo, AddressRepo);
+            var addAppointmentForm = new AppointmentDetail(DetailMode.Add, this, AppointmentRepo, CustomerRepo, AddressRepo, LoggedInUser);
             addAppointmentForm.Show();
         }
 
         private void btnModifyAppointment_Click(object sender, EventArgs e)
         {
             var selectedAppointment = (Appointment)dgAppointments.SelectedRows[0].DataBoundItem;
-            var modifyAppointmentForm = new AppointmentDetail(DetailMode.Modify, this, AppointmentRepo, CustomerRepo, AddressRepo, selectedAppointment);
+            var modifyAppointmentForm = new AppointmentDetail(DetailMode.Modify, this, AppointmentRepo, CustomerRepo, AddressRepo, LoggedInUser, selectedAppointment);
             modifyAppointmentForm.Show();
         }
 
@@ -104,7 +106,7 @@ namespace Scheduler
 
         private void btnMasterSchedule_Click(object sender, EventArgs e)
         {
-            var report = "";
+            var report = $"Master Schedule Report \n  Requested {DateTime.Now.ToString("f", DateTimeFormatInfo.InvariantInfo)} \n";
 
             var users = UserRepo.GetAllUsers();
             var appointments = AppointmentRepo.GetAllAppointments();
@@ -128,7 +130,7 @@ namespace Scheduler
         private void btnCustomersByCity_Click(object sender, EventArgs e)
         {
             var cities = AddressRepo.GetAllCities();
-            var report = "";
+            var report = $"Customers By City Report \n  Requested {DateTime.Now.ToString("f", DateTimeFormatInfo.InvariantInfo)} \n";
 
             foreach (var city in cities)
             {
@@ -155,7 +157,7 @@ namespace Scheduler
 
         private string GenerateMonthlyTypesReport(IList<Appointment> appointments)
         {
-            var report = "";
+            var report = $"Appointment Types By Month Report \n  Requested {DateTime.Now.ToString("f", DateTimeFormatInfo.InvariantInfo)} \n";
             var januaryTypes = GetTypesOfAppointmentsForMonth(1, appointments);
             var februaryTypes = GetTypesOfAppointmentsForMonth(2, appointments);
             var marchTypes = GetTypesOfAppointmentsForMonth(3, appointments);
@@ -229,6 +231,32 @@ namespace Scheduler
             }
 
             return result;
+        }
+
+        private void btnCustomerSearch_Click(object sender, EventArgs e)
+        {
+            var searchText = txtCustomerSearch.Text;
+
+            if (string.IsNullOrWhiteSpace(searchText))
+            {
+                dgCustomers.DataSource = Customers;
+                return;
+            }
+
+            dgCustomers.DataSource = Customers.Where(c => c.CustomerName.ToLower().Contains(searchText.ToLower())).ToList();
+        }
+
+        private void btnAppointmentSearch_Click(object sender, EventArgs e)
+        {
+            var searchText = txtAppointmentSearch.Text;
+
+            if (string.IsNullOrWhiteSpace(searchText))
+            {
+                dgAppointments.DataSource = Appointments;
+                return;
+            }
+
+            dgAppointments.DataSource = Appointments.Where(a => a.Title.ToLower().Contains(searchText.ToLower())).ToList();
         }
     }
 }

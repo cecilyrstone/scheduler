@@ -33,7 +33,7 @@ namespace Scheduler.Repository
                 cmd.Parameters["@Id"].Value = id;
                 var reader = cmd.ExecuteReader();
                 appointment = ConstructAppointment(reader);
-                LocationService.AdjustAppointmentTimeForZone(appointment);
+                //LocationService.AdjustAppointmentTimeForZone(appointment);
                 reader.Close();
             }
             catch (Exception e)
@@ -69,12 +69,12 @@ namespace Scheduler.Repository
                 cmd.Parameters.Add("@Location", MySqlDbType.VarChar);
                 cmd.Parameters.Add("@Contact", MySqlDbType.VarChar);
                 cmd.Parameters.Add("@Url", MySqlDbType.VarChar);
-                cmd.Parameters.Add("@Start", MySqlDbType.VarChar);
-                cmd.Parameters.Add("@End", MySqlDbType.VarChar);
+                cmd.Parameters.Add("@Start", MySqlDbType.DateTime);
+                cmd.Parameters.Add("@End", MySqlDbType.DateTime);
                 cmd.Parameters.Add("@Type", MySqlDbType.VarChar);
                 cmd.Parameters.Add("@CreateDate", MySqlDbType.VarChar);
                 cmd.Parameters.Add("@CreatedBy", MySqlDbType.VarChar);
-                cmd.Parameters.Add("@LastUpdate", MySqlDbType.VarChar);
+                cmd.Parameters.Add("@LastUpdate", MySqlDbType.Timestamp);
                 cmd.Parameters.Add("@LastUpdateBy", MySqlDbType.VarChar);
 
                 cmd.Parameters["@CustomerId"].Value = appointment.CustomerId;
@@ -120,7 +120,7 @@ namespace Scheduler.Repository
                       $"type = @Type, " +
                       $"url = @Url, " +
                       $"start = @Start, " +
-                      $"end = @End" +
+                      $"end = @End," +
                       $"lastUpdate = @LastUpdate, " +
                       $"lastUpdateBy = @LastUpdateBy WHERE appointmentId = @AppointmentId;";
             try
@@ -135,9 +135,9 @@ namespace Scheduler.Repository
                 cmd.Parameters.Add("@Contact", MySqlDbType.VarChar);
                 cmd.Parameters.Add("@Type", MySqlDbType.VarChar);
                 cmd.Parameters.Add("@Url", MySqlDbType.VarChar);
-                cmd.Parameters.Add("@Start", MySqlDbType.VarChar);
-                cmd.Parameters.Add("@End", MySqlDbType.VarChar);
-                cmd.Parameters.Add("@LastUpdate", MySqlDbType.VarChar);
+                cmd.Parameters.Add("@Start", MySqlDbType.DateTime);
+                cmd.Parameters.Add("@End", MySqlDbType.DateTime);
+                cmd.Parameters.Add("@LastUpdate", MySqlDbType.Timestamp);
                 cmd.Parameters.Add("@LastUpdateBy", MySqlDbType.VarChar);
 
                 cmd.Parameters["@AppointmentId"].Value = appointment.Id;
@@ -151,8 +151,36 @@ namespace Scheduler.Repository
                 cmd.Parameters["@Start"].Value = TimeZoneInfo.ConvertTimeToUtc(appointment.Start);
                 cmd.Parameters["@End"].Value = TimeZoneInfo.ConvertTimeToUtc(appointment.End);
                 cmd.Parameters["@Type"].Value = appointment.Type;
-                cmd.Parameters["@LastUpdate"].Value = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss");
+                cmd.Parameters["@LastUpdate"].Value = DateTime.Now;
                 cmd.Parameters["@LastUpdateBy"].Value = LoggedInUser.UserName;
+                cmd.ExecuteNonQuery();
+            }
+            catch (Exception e)
+            {
+                throw e;
+            }
+            finally
+            {
+                if (connection.State == ConnectionState.Open)
+                {
+                    connection.Close();
+                }
+            }
+
+            var appt = GetAppointment(appointment.Id);
+            var url = appt.Url;
+        }
+
+        public void DeleteAppointment(int id)
+        {
+            connection.Open();
+
+            try
+            {
+                var sql = $"DELETE FROM appointment WHERE appointmentId = @Id;";
+                MySqlCommand cmd = new MySqlCommand(sql, connection);
+                cmd.Parameters.Add("@Id", MySqlDbType.Int32);
+                cmd.Parameters["@Id"].Value = id;
                 cmd.ExecuteNonQuery();
             }
             catch (Exception e)
@@ -168,16 +196,16 @@ namespace Scheduler.Repository
             }
         }
 
-        public void DeleteAppointment(int id)
+        public void DeleteAppointmentsForCustomer(int customerId)
         {
             connection.Open();
 
             try
             {
-                var sql = $"DELETE FROM appointment WHERE appointmentId = @Id;";
+                var sql = $"DELETE FROM appointment WHERE customerId = @customerId;";
                 MySqlCommand cmd = new MySqlCommand(sql, connection);
-                cmd.Parameters.Add("@Id", MySqlDbType.Int32);
-                cmd.Parameters["@Id"].Value = id;
+                cmd.Parameters.Add("@customerId", MySqlDbType.Int32);
+                cmd.Parameters["@customerId"].Value = customerId;
                 cmd.ExecuteNonQuery();
             }
             catch (Exception e)
