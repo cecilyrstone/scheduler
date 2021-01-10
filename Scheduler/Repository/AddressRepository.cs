@@ -387,8 +387,28 @@ namespace Scheduler.Repository
                 Phone = "(555) 867-5309"
             };
 
+            var address3 = new Address()
+            {
+                Address1 = "123 Ranch St",
+                Address2 = "",
+                CityId = 3,
+                PostalCode = "90210",
+                Phone = "(555) 867-5309"
+            };
+
+            var address4 = new Address()
+            {
+                Address1 = "123 Ranch St",
+                Address2 = "",
+                CityId = 3,
+                PostalCode = "90210",
+                Phone = "(555) 867-5309"
+            };
+
             SaveAddress(address1);
             SaveAddress(address2);
+            SaveAddress(address3);
+            SaveAddress(address4);
         }
     }
 }

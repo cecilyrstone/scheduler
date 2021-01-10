@@ -220,23 +220,23 @@ namespace Scheduler.Repository
 
             var user1 = new User
             {
-                UserName = "mom",
+                UserName = "cecily",
                 Password = "coffee",
                 Active = true
             };
 
             var user2 = new User
             {
-                UserName = "dad",
+                UserName = "paul",
                 Password = "naps",
-                Active = false
+                Active = true
             };
 
             var user3 = new User
             {
                 UserName = "test",
                 Password = "test",
-                Active = false
+                Active = true
             };
 
             LoggedInUser = user1;

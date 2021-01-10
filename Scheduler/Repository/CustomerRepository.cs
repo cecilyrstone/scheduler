@@ -69,7 +69,7 @@ namespace Scheduler.Repository
 
                 cmd.Parameters["@CustomerName"].Value = customer.CustomerName;
                 cmd.Parameters["@AddressId"].Value = customer.AddressId;
-                cmd.Parameters["@Active"].Value = (customer.Active) ? "1" : "0";
+                cmd.Parameters["@Active"].Value = "1";
                 cmd.Parameters["@CreateDate"].Value = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss");
                 cmd.Parameters["@CreatedBy"].Value = LoggedInUser.UserName;
                 cmd.Parameters["@LastUpdate"].Value = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss");
@@ -112,7 +112,7 @@ namespace Scheduler.Repository
                 cmd.Parameters["@CustomerId"].Value = customer.Id;
                 cmd.Parameters["@CustomerName"].Value = customer.CustomerName;
                 cmd.Parameters["@AddressId"].Value = customer.AddressId;
-                cmd.Parameters["@Active"].Value = (customer.Active) ? "1" : "0";
+                cmd.Parameters["@Active"].Value = "1";
                 cmd.Parameters["@LastUpdate"].Value = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss");
                 cmd.Parameters["@LastUpdateBy"].Value = LoggedInUser.UserName;
                 cmd.ExecuteNonQuery();
@@ -243,28 +243,36 @@ namespace Scheduler.Repository
         {
             var customer1 = new Customer
             {
-                CustomerName = "The Baby",
-                AddressId = 2,
+                CustomerName = "International, Inc",
+                AddressId = 1,
                 Active = true
             };
 
             var customer2 = new Customer
             {
-                CustomerName = "The Julie",
+                CustomerName = "Strategic Alliance",
                 AddressId = 2,
                 Active = true
             };
 
             var customer3 = new Customer
             {
-                CustomerName = "The Dog",
-                AddressId = 2,
+                CustomerName = "United Logistics Corps",
+                AddressId = 3,
+                Active = true
+            };
+
+            var customer4 = new Customer
+            {
+                CustomerName = "Agile Consulting",
+                AddressId = 4,
                 Active = true
             };
 
             SaveCustomer(customer1);
             SaveCustomer(customer2);
             SaveCustomer(customer3);
+            SaveCustomer(customer4);
         }
     }
 }

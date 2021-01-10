@@ -95,13 +95,20 @@ namespace Scheduler
             var beginReminderInterval = DateTime.Now;
             var endReminderInterval = DateTime.Now.AddMinutes(15);
 
-            foreach (var appointment in Appointments)
+            if (Appointments == null)
+                return false;
+
+            if (Appointments.Any())
             {
-                if (appointment.Start > beginReminderInterval && appointment.Start < endReminderInterval)
+                foreach (var appointment in Appointments)
                 {
-                    return true;
+                    if (appointment.Start > beginReminderInterval && appointment.Start < endReminderInterval && appointment.UserId == LoggedInUser.Id)
+                    {
+                        return true;
+                    }
                 }
             }
+            
             return false;
         }
 

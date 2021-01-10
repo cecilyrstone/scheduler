@@ -344,71 +344,71 @@ namespace Scheduler.Repository
             var appointment1 = new Appointment
             {
                 CustomerId = 1,
-                UserId = 1,
-                Title = "Eat bananas with the baby",
-                Description = "The baby wants to eat bananas. But she can't do it alone. She has to force feed you first",
-                Location = "Home",
-                Contact = "The baby",
+                UserId = 3,
+                Title = "Strategy meeting",
+                Description = "lorem ipsum dolor sit amet",
+                Location = "HQ",
+                Contact = "Julia",
                 Url = "",
                 Start = DateTime.Now.AddDays(2),
                 End = DateTime.Now.AddDays(2).AddHours(1),
-                Type = "parenting"
+                Type = "strategys"
             };
 
             var appointment2 = new Appointment
             {
                 CustomerId = 2,
-                UserId = 1,
-                Title = "Go to school program",
-                Description = "There is a bug themed kindergarten program. You must handmake a costume somehow",
-                Location = "School",
-                Contact = "The Julie",
+                UserId = 3,
+                Title = "Retrospective",
+                Description = "lorem ipsum dolor sit amet",
+                Location = "HQ",
+                Contact = "Lorelei",
                 Url = "",
                 Start = DateTime.Now.AddDays(7),
                 End = DateTime.Now.AddDays(7).AddHours(4),
-                Type = "parenting"
+                Type = "project"
             };
 
             var appointment3 = new Appointment
             {
                 CustomerId = 3,
-                UserId = 2,
-                Title = "Take the dog to the vet",
-                Description = "She won't heat unless you put ketchup on her food. Is she sick or just spoiled?",
-                Location = "The Vet",
-                Contact = "The Dog",
+                UserId = 3,
+                Title = "Planning meeting",
+                Description = "lorem ipsum dolor sit amet?",
+                Location = "HQs",
+                Contact = "Doug",
                 Url = "",
                 Start = DateTime.Now.AddDays(9),
                 End = DateTime.Now.AddDays(9).AddHours(2),
-                Type = "dog"
+                Type = "projects"
             };
 
             var appointment4 = new Appointment
             {
                 CustomerId = 1,
-                UserId = 1,
-                Title = "Take the baby to yoga",
-                Description = "Take the baby to yoga, for some mysterious reason",
-                Location = "Yoga Studio",
-                Contact = "The Baby",
+                UserId = 3,
+                Title = "Quarterly review",
+                Description = "lorem ipsum dolor sit amet",
+                Location = "HQ",
+                Contact = "Dan",
                 Url = "",
                 Start = DateTime.Now.AddDays(3),
                 End = DateTime.Now.AddDays(3).AddHours(2),
-                Type = "parenting"
+                Type = "accounting"
             };
 
             var appointment5 = new Appointment
             {
                 CustomerId = 1,
                 UserId = 2,
-                Title = "Take a nice nap",
-                Description = "Soft couch and cold beer",
-                Location = "Living room",
-                Contact = "None",
+                Title = "Project kickoff",
+                Description = "lorem ipsum dolor sit amet",
+                Location = "HQ",
+                Contact = "Marisa",
                 Url = "",
                 Start = DateTime.Now.AddHours(2),
                 End = DateTime.Now.AddHours(3),
-                Type = "restorative"
+                Type = "project"
             };
 
             SaveAppointment(appointment1);
