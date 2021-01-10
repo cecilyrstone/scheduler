@@ -117,6 +117,7 @@
     <Compile Include="Repository\CustomerRepository.cs" />
     <Compile Include="Repository\LoginRepository.cs" />
     <Compile Include="Repository\MySqlRepository.cs" />
+    <Compile Include="Services\SearchService.cs" />
     <Compile Include="Services\LocationService.cs" />
     <Compile Include="Weekly.cs">
       <SubType>Form</SubType>

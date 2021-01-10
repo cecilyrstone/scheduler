@@ -1,6 +1,7 @@
 ﻿using Scheduler.Enum;
 using Scheduler.Models;
 using Scheduler.Repository;
+using Scheduler.Services;
 using System;
 using System.Collections.Generic;
 using System.Globalization;
@@ -235,28 +236,12 @@ namespace Scheduler
 
         private void btnCustomerSearch_Click(object sender, EventArgs e)
         {
-            var searchText = txtCustomerSearch.Text;
-
-            if (string.IsNullOrWhiteSpace(searchText))
-            {
-                dgCustomers.DataSource = Customers;
-                return;
-            }
-
-            dgCustomers.DataSource = Customers.Where(c => c.CustomerName.ToLower().Contains(searchText.ToLower())).ToList();
+            dgCustomers.DataSource = SearchService.SearchCustomers(Customers, txtCustomerSearch.Text);
         }
 
         private void btnAppointmentSearch_Click(object sender, EventArgs e)
         {
-            var searchText = txtAppointmentSearch.Text;
-
-            if (string.IsNullOrWhiteSpace(searchText))
-            {
-                dgAppointments.DataSource = Appointments;
-                return;
-            }
-
-            dgAppointments.DataSource = Appointments.Where(a => a.Title.ToLower().Contains(searchText.ToLower())).ToList();
+            dgAppointments.DataSource = SearchService.SearchAppointments(Appointments, txtAppointmentSearch.Text);
         }
     }
 }

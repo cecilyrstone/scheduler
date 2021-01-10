@@ -33,7 +33,7 @@ namespace Scheduler.Repository
                 cmd.Parameters["@Id"].Value = id;
                 var reader = cmd.ExecuteReader();
                 appointment = ConstructAppointment(reader);
-                //LocationService.AdjustAppointmentTimeForZone(appointment);
+                LocationService.AdjustAppointmentTimeForZone(appointment);
                 reader.Close();
             }
             catch (Exception e)
@@ -166,9 +166,6 @@ namespace Scheduler.Repository
                     connection.Close();
                 }
             }
-
-            var appt = GetAppointment(appointment.Id);
-            var url = appt.Url;
         }
 
         public void DeleteAppointment(int id)
